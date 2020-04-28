@@ -42,7 +42,7 @@ print(numFound, "documents found.")
 chapters = [['"id"', '"title"', '"abstract"']]
 
 start = 0
-for i in range(0, 40, rows):
+for i in range(0, numFound, rows):
     print(f"Get documents {start + 1} to {start + rows}")
     data = get_data(start, rows)
 

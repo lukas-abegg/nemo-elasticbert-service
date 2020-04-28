@@ -35,17 +35,17 @@ To rebuild the image, simply run
 $ docker-compose up --build
 ```
 **CAUTION**: If possible, assign high memory(more than 8GB) to Docker's memory configuration because BERT container needs high memory.
-### 4.Check Docker containers are running
+### 4. Check Docker containers are running
  ```bash
 $ docker ps
 ```
-### 4.Install dependencies.
+### 5. Install dependencies.
 ```bash
 pip install argparse 
 pip install elasticsearch 
 pip install bert-serving-client
 ```
-### 5.Create elasticsearch index
+### 6. Create elasticsearch index
 ```bash
 python3 elastic/create_index.py --index mpedia --config elastic/index_config.json
 ```
@@ -53,23 +53,23 @@ python3 elastic/create_index.py --index mpedia --config elastic/index_config.jso
    * `--index` and `--config` arguments specify the name of the elasticsearch index and schema of the target index, respectively.
    * You can verify the index by checking http://127.0.0.1:9200/mpedia
 
-### 6.Create documents
+### 7. Create documents
 ```bash
 python3 elastic/create_document.py --index mpedia --csv exported_data/mpedia_chapters.csv --output exported_data/mpedia_chapters.json
 ```
    * This script creates an `example.json1` file in the elasticsearch prescribed format which in-turn to be indexed later.
    
-### 7.Create indexes
+### 8. Create indexes
 ```bash
 python3 elastic/index_documents.py --data exported_data/mpedia_chapters.json
 ```
    * This scripts generates the actual indexes and saves it into elasticsearch
    * verify it by checking http://127.0.0.1:9200/mpedia/_search
 
-### 8.Test the engine.
+### 9. Test the engine.
 ```bash
 python3 elastic/elastic.py
 ```
 
-### 9. Open browser
+### 10. Open browser
 Go to: http://127.0.0.1:5000
