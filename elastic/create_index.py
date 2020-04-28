@@ -11,6 +11,13 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch('localhost:9200')
 
 
+def delete_old_index(index):
+    try:
+        es.indices.delete(index=index, ignore=[400, 404])
+    except Exception as e:
+        print("[WARNING] some exception has occurred!")
+
+
 def create_index(index, config):
     try:
         with open(config) as file:
@@ -27,4 +34,5 @@ if __name__ == "__main__":
     parser.add_argument('--index', required=True, help='name of the ES index')
     parser.add_argument('--config', required=True, help='path to the ES mapping config')
     args = parser.parse_args()
+    delete_old_index(args.index)
     create_index(args.index, args.config)

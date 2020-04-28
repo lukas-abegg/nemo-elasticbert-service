@@ -41,13 +41,13 @@ $ docker ps
 ```
 ### 5. Install dependencies.
 ```bash
-pip install argparse 
-pip install elasticsearch 
-pip install bert-serving-client
+$ pip install argparse 
+$ pip install elasticsearch 
+$ pip install bert-serving-client
 ```
 ### 6. Create elasticsearch index
 ```bash
-python3 elastic/create_index.py --index mpedia --config elastic/index_config.json
+$ python3 elastic/create_index.py --index mpedia --config elastic/index_config.json
 ```
    * create_index.py script creates an index in elasticsearch
    * `--index` and `--config` arguments specify the name of the elasticsearch index and schema of the target index, respectively.
@@ -55,20 +55,20 @@ python3 elastic/create_index.py --index mpedia --config elastic/index_config.jso
 
 ### 7. Create documents
 ```bash
-python3 elastic/create_document.py --index mpedia --csv exported_data/mpedia_chapters.csv --output exported_data/mpedia_chapters.json
+$ python3 elastic/create_document.py --index mpedia --csv exported_data/mpedia_chapters.csv --output exported_data/mpedia_chapters.json
 ```
    * This script creates an `example.json1` file in the elasticsearch prescribed format which in-turn to be indexed later.
    
 ### 8. Create indexes
 ```bash
-python3 elastic/index_documents.py --data exported_data/mpedia_chapters.json
+$ python3 elastic/index_documents.py --data exported_data/mpedia_chapters.json
 ```
    * This scripts generates the actual indexes and saves it into elasticsearch
    * verify it by checking http://127.0.0.1:9200/mpedia/_search
 
 ### 9. Test the engine.
 ```bash
-python3 elastic/elastic.py
+$ python3 elastic/elastic.py
 ```
 
 ### 10. Open browser
