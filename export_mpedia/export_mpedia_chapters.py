@@ -2,6 +2,9 @@ import json
 from bs4 import BeautifulSoup
 import urllib3
 import numpy as np
+import pandas as pd
+
+import re
 
 http = urllib3.PoolManager()
 
@@ -14,15 +17,21 @@ def get_data(start: int, rows: int):
     return json.loads(response.data.decode('utf-8'))
 
 
+_RE_COMBINE_WHITESPACE = re.compile(r"\s+")
+
+
 def clean_text_from_html(raw_html: str) -> str:
-    return BeautifulSoup(raw_html, 'html.parser').text
+    clean_text = BeautifulSoup(raw_html, 'html.parser').text
+    clean_text.replace('\r', '').replace('\n', '')
+    clean_text = _RE_COMBINE_WHITESPACE.sub(" ", clean_text).strip()
+    return clean_text
 
 
 def get_document_data(document):
     doc_id = document['id']
     doc_title = clean_text_from_html(document['titleHtml'])
     doc_abstract = clean_text_from_html(document['abstractHtml'])
-    return [f'"{doc_id}"', f'"{doc_title}"', f'"{doc_abstract}"']
+    return [doc_id, doc_title, doc_abstract]
 
 
 export_folder = "../exported_data/"
@@ -31,7 +40,8 @@ filename_csv = export_folder + "mpedia_chapters.csv"
 
 def create_csv(data):
     arr = np.asarray(data)
-    np.savetxt(filename_csv, arr, fmt='%s', delimiter=",")
+    df = pd.DataFrame(data=arr, columns=['id', 'title', 'abstract'])
+    df.to_csv(filename_csv, index=False)
     print(filename_csv, "is created")
 
 
@@ -39,7 +49,7 @@ data = get_data(0, 0)
 numFound = data['response']['numFound']
 print(numFound, "documents found.")
 
-chapters = [['"id"', '"title"', '"abstract"']]
+chapters = []
 
 start = 0
 for i in range(0, numFound, rows):

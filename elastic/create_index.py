@@ -15,7 +15,7 @@ def delete_old_index(index):
     try:
         es.indices.delete(index=index, ignore=[400, 404])
     except Exception as e:
-        print("[WARNING] some exception has occurred!")
+        print("[WARNING] some exception has occurred!", e)
 
 
 def create_index(index, config):
@@ -26,7 +26,7 @@ def create_index(index, config):
         es.indices.create(index=index, body=config)
         print("[INFO] index " + index + " has been created!")
     except Exception as e:
-        print("[WARNING] some exception has occurred!")
+        print("[WARNING] some exception has occurred!", e)
 
 
 if __name__ == "__main__":

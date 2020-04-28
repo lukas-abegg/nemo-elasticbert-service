@@ -4,6 +4,7 @@ This script creates documents in the required format for
 indexing.
 
 """
+import os
 
 import json
 from pandas import read_csv
@@ -27,7 +28,7 @@ def create_document(doc, embs, index_name):
 
 def load_dataset(path):
     docs = []
-    df = read_csv(path)
+    df = read_csv(path, escapechar='\\')
     for row in df.iterrows():
         series = row[1]
         doc = {
@@ -39,23 +40,38 @@ def load_dataset(path):
     return docs
 
 
-def bulk_predict(docs, batch_size=256):
+def bulk_write_to_json(output_file: str, index: str, docs, vecs):
+    with open(output_file, mode='a', encoding='utf-8') as f:
+        for doc, embs in zip(docs, vecs):
+            d = create_document(doc, embs, index)
+            f.write(json.dumps(d) + '\n')
+
+
+def predict_vecs_and_write_to_json(output_file: str, index: str, docs, batch_size=50):
     for i in range(0, len(docs), batch_size):
         batch_docs = docs[i: i + batch_size]
 
         embeddings_titles = bc.encode([doc['title'] for doc in batch_docs])
         embeddings_abstracts = bc.encode([doc['abstract'] for doc in batch_docs])
 
-        for j in range(0, len(embeddings_titles)):
-            yield embeddings_titles[j], embeddings_abstracts[j]
+        embeddings = [[embeddings_titles[j], embeddings_abstracts[j]] for j in range(0, len(embeddings_titles))]
+
+        print(f"[INFO] Write document {i} up to {i+batch_size} into json {output_file}")
+        bulk_write_to_json(output_file, index, batch_docs, embeddings)
+        print(f"[INFO] Bulk writing done!")
+
+
+def delete_old_json(json_file):
+    if os.path.exists(json_file):
+        os.remove(json_file)
+    else:
+        print("The file does not exist")
 
 
 def main(args):
+    delete_old_json(args.output)
     docs = load_dataset(args.csv)
-    with open(args.output, 'w') as f:
-        for doc, embs in zip(docs, bulk_predict(docs)):
-            d = create_document(doc, embs, args.index)
-            f.write(json.dumps(d) + '\n')
+    predict_vecs_and_write_to_json(args.output, args.index, docs)
 
 
 if __name__ == "__main__":
