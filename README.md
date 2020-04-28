@@ -26,7 +26,7 @@ You need to set a pretrained BERT model and Elasticsearch's index name as enviro
 $ export PATH_MODEL=./bert/model/bert-base-german-cased
 $ export INDEX_NAME=mpedia
 ```
-### 3.Run Docker containers
+### 3. Run Docker containers
  ```bash
 $ docker-compose up
 ```
