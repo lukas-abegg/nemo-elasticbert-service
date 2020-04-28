@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+
+#  web:
+#    build: ./web
+#    ports:
+#      - "5000:5000"
+#    environment:
+#      - INDEX_NAME
+#    depends_on:
+#      - elasticsearch
+#      - bertserving
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    tty: true
+    environment:
+      discovery.type: single-node
+
+  bertserving:
+    build: ./bert/docker
+    ports:
+      - "5555:5555"
+      - "5556:5556"
+    environment:
+      - PATH_MODEL=${PATH_MODEL}
+    volumes:
+      - "${PATH_MODEL}:/model"
+
+volumes:
+  es-data:
+    driver: local
