@@ -9,7 +9,7 @@ rows = 20
 
 
 def get_data(start: int, rows: int):
-    url = f"http://nemo-solrcloud-qa.springer-sbm.com:8983/solr/nemo_mpedia_fulltext-2020-04-27-17-09-46-192/select?q=*:*&wt=json&rows={rows}&start={start}"
+    url = f"http://nemo-solrcloud-qa.springer-sbm.com:8983/solr/nemo_mpedia_fulltext/select?q=*:*&wt=json&rows={rows}&start={start}"
     response = http.request('GET', url)
     return json.loads(response.data.decode('utf-8'))
 
