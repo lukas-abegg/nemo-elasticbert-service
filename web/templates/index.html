@@ -33,12 +33,14 @@
             <v-col cols="5">
                 <div>
                     <label>
-                        <input class="form-check-input" type="radio" checked value="vec" name="searchmode" autocomplete="off" v-model="mode">
+                        <input class="form-check-input" type="radio" checked value="vec" name="searchmode"
+                               autocomplete="off" v-model="mode">
                         Vector Search
                     </label>
                     &nbsp;
                     <label>
-                        <input class="form-check-input" type="radio" value="word" name="searchmode" autocomplete="off"  v-model="mode">
+                        <input class="form-check-input" type="radio" value="word" name="searchmode" autocomplete="off"
+                               v-model="mode">
                         Keyword Search
                     </label>
                 </div>
@@ -49,10 +51,14 @@
             <v-row class="ml-0">
                 <v-col cols="12" md="6" offset-md="2" offset-lg="2" offset-xl="2">
                     <template v-if="'hits' in result">
+                        <v-card-actions>
+                                <v-chip class="secondary">Found documents: [[ result.hits.total.value ]]</v-chip>
+                            </v-card-actions>
                         <v-card max-width="700" flat v-for="(item, index) in result.hits.hits" :key="index">
                             <v-card-title>[[ item._source.title ]]</v-card-title>
-                            <v-card-text>[[ item._source.id ]]</v-card-text>
+                            <v-card-text><v-chip>[[ item._source.id ]] </v-chip> &nbsp;&nbsp; <v-chip class="primary">Relevance Score: [[ item._score ]]</v-chip></v-card-text>
                             <v-card-text>[[ item._source.abstract.slice(0, 300) ]]...</v-card-text>
+
                         </v-card>
                     </template>
                 </v-col>

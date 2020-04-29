@@ -22,7 +22,7 @@ _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
 
 def clean_text_from_html(raw_html: str) -> str:
     clean_text = BeautifulSoup(raw_html, 'html.parser').text
-    clean_text.replace('\r', '').replace('\n', '')
+    clean_text.replace('\r', ' ').replace('\n', ' ')
     clean_text = _RE_COMBINE_WHITESPACE.sub(" ", clean_text).strip()
     return clean_text
 

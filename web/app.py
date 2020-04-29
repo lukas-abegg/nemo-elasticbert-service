@@ -28,15 +28,21 @@ def word_search(query):
     }
 
 
-def vector_search(query_vector):
+def vector_search(query, query_vector):
+
     return {
         "function_score": {
-            "query": {"match_all": {}},
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["title^0.01", "abstract^0.01"]
+                }
+            },
             "functions": [
                 {
                     "script_score": {
                         "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['abstract_vector'])",
+                            "source": "cosineSimilarity(params.query_vector, doc['abstract_vector'])+2",
                             "params": {"query_vector": query_vector}
                         }
                     }
@@ -44,7 +50,7 @@ def vector_search(query_vector):
                 {
                     "script_score": {
                         "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['title_vector'])",
+                            "source": "cosineSimilarity(params.query_vector, doc['title_vector'])+2",
                             "params": {"query_vector": query_vector}
                         }
                     }
@@ -63,8 +69,8 @@ def analyzer():
     query_vector = bc.encode([query])[0]
     pprint(query)
 
-    if (mode == "vec"):
-        request_elastic = vector_search(query_vector)
+    if mode == "vec":
+        request_elastic = vector_search(query, query_vector)
     else:
         request_elastic = word_search(query)
 

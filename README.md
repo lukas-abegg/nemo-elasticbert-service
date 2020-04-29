@@ -59,7 +59,7 @@ $ python3 elastic/create_document.py --index mpedia --csv exported_data/mpedia_c
 ```
    * This script creates an `example.json1` file in the elasticsearch prescribed format which in-turn to be indexed later.
    
-### 8. Create indexes
+### 8. Index documents
 ```bash
 $ python3 elastic/index_documents.py --data exported_data/mpedia_chapters.json
 ```
