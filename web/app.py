@@ -23,7 +23,7 @@ def word_search(query):
     return {
         "multi_match": {
             "query": query,
-            "fields": ["title", "abstract"]
+            "fields": ["title^0.8", "abstract^0.5"]
         }
     }
 
@@ -35,7 +35,7 @@ def vector_search(query, query_vector):
             "query": {
                 "multi_match": {
                     "query": query,
-                    "fields": ["title^0.01", "abstract^0.01"]
+                    "fields": ["title^0.8", "abstract^0.5"]
                 }
             },
             "functions": [
@@ -50,7 +50,7 @@ def vector_search(query, query_vector):
                 {
                     "script_score": {
                         "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['title_vector'])+2",
+                            "source": "cosineSimilarity(params.query_vector, doc['title_vector'])+1",
                             "params": {"query_vector": query_vector}
                         }
                     }

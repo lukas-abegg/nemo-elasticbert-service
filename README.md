@@ -71,5 +71,9 @@ $ python3 elastic/index_documents.py --data exported_data/mpedia_chapters.json
 $ python3 elastic/elastic.py
 ```
 
-### 10. Open browser
+### 10. Start search app and browse
+Run app via:
+```bash
+$ python3 web/app.py
+```
 Go to: http://127.0.0.1:5000
