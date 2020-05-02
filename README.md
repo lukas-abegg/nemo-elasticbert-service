@@ -14,7 +14,7 @@ Consequently, is a domain specific model better than a language specific but gen
 
 ```bash
 Download from https://drive.google.com/file/d/1R84voFKHfWV9xjzeLzWBbmY1uOMYpnyD/view?usp=sharing
-$ unzip biobert.zip
+$ tar -xvf biobert_v1.1_pubmed.tar.gz
 $ cp biobert bert/models/
 ```
 
