@@ -23,26 +23,45 @@ def word_search(query):
     return {
         "multi_match": {
             "query": query,
-            "fields": ["title^0.8", "abstract^0.5"]
+            "fields": [
+                "title^3",
+                "title.ngram",
+                "title.edge_ngram^2",
+                "abstract^2",
+                "abstract.ngram",
+                "abstract.edge_ngram"
+            ]
         }
     }
 
 
 def vector_search(query, query_vector):
-
     return {
         "function_score": {
             "query": {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["title^0.8", "abstract^0.5"]
+                "bool": {
+                    "must": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": [
+                                    "title^3",
+                                    "title.ngram",
+                                    "title.edge_ngram^2",
+                                    "abstract^2",
+                                    "abstract.ngram",
+                                    "abstract.edge_ngram"
+                                ]
+                            }
+                        }
+                    ]
                 }
             },
             "functions": [
                 {
                     "script_score": {
                         "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['abstract_vector'])+2",
+                            "source": "(cosineSimilarity(params.query_vector, doc['abstract_vector'])+ 1.0)*10",
                             "params": {"query_vector": query_vector}
                         }
                     }
@@ -50,7 +69,7 @@ def vector_search(query, query_vector):
                 {
                     "script_score": {
                         "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['title_vector'])+1",
+                            "source": "(cosineSimilarity(params.query_vector, doc['title_vector'])+ 1.0)*10",
                             "params": {"query_vector": query_vector}
                         }
                     }

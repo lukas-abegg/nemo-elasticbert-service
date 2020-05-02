@@ -1,15 +1,90 @@
 {
-"settings" : {
+  "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 1
-},
-
-"mappings": {
-        "properties": {
-            "id": {"type": "text"},
-            "title": {"type": "text"},
-            "abstract": {"type":  "text"},
-            "title_vector": {"type":  "dense_vector", "dims":  768},
-            "abstract_vector": {"type":  "dense_vector", "dims":  768}
-        }}
+    "number_of_replicas": 1,
+    "analysis": {
+      "analyzer": {
+        "ngram_analyzer": {
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "edge_ngram_analyzer": {
+          "tokenizer": "edge_ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "lowercase_search": {
+          "tokenizer": "lowercase"
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 3,
+          "max_gram": 4,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        },
+        "edge_ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 10,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "ngram": {
+            "type": "text",
+            "analyzer": "ngram_analyzer",
+            "search_analyzer": "lowercase_search"
+          },
+          "edge_ngram": {
+            "type": "text",
+            "analyzer": "edge_ngram_analyzer",
+            "search_analyzer": "lowercase_search"
+          }
+        }
+      },
+      "abstract": {
+        "type": "text",
+        "fields": {
+          "ngram": {
+            "type": "text",
+            "analyzer": "ngram_analyzer",
+            "search_analyzer": "lowercase_search"
+          },
+          "edge_ngram": {
+            "type": "text",
+            "analyzer": "edge_ngram_analyzer",
+            "search_analyzer": "lowercase_search"
+          }
+        }
+      },
+      "title_vector": {
+        "type": "dense_vector",
+        "dims": 768
+      },
+      "abstract_vector": {
+        "type": "dense_vector",
+        "dims": 768
+      }
+    }
+  }
 }
