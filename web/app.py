@@ -19,23 +19,23 @@ def index():
     return render_template('index.html')
 
 
-def word_search(query):
+def word_search(query, boost_title: int, boost_abstract: int):
     return {
         "multi_match": {
             "query": query,
             "fields": [
-                "title^3",
-                "title.ngram",
-                "title.edge_ngram^2",
-                "abstract^2",
-                "abstract.ngram",
-                "abstract.edge_ngram"
+                f"title^{boost_title}",
+                f"title.edge_ngram^{float(boost_title / 2)}",
+                f"title.ngram^{float(boost_title / 4)}",
+                f"abstract^{boost_abstract}",
+                f"abstract.edge_ngram^{float(boost_title / 2)}",
+                f"abstract.ngram^{float(boost_title / 4)}"
             ]
         }
     }
 
 
-def vector_search(query, query_vector):
+def vector_search(query, query_vector, boost_title: int, boost_abstract: int, boost_vec_title: int, boost_vec_abstract: int):
     return {
         "function_score": {
             "query": {
@@ -45,12 +45,12 @@ def vector_search(query, query_vector):
                             "multi_match": {
                                 "query": query,
                                 "fields": [
-                                    "title^3",
-                                    "title.ngram",
-                                    "title.edge_ngram^2",
-                                    "abstract^2",
-                                    "abstract.ngram",
-                                    "abstract.edge_ngram"
+                                    f"title^{boost_title}",
+                                    f"title.edge_ngram^{float(boost_title / 2)}",
+                                    f"title.ngram^{float(boost_title / 4)}",
+                                    f"abstract^{boost_abstract}",
+                                    f"abstract.edge_ngram^{float(boost_title / 2)}",
+                                    f"abstract.ngram^{float(boost_title / 4)}"
                                 ]
                             }
                         }
@@ -61,16 +61,16 @@ def vector_search(query, query_vector):
                 {
                     "script_score": {
                         "script": {
-                            "source": "(cosineSimilarity(params.query_vector, doc['abstract_vector'])+ 1.0)*10",
-                            "params": {"query_vector": query_vector}
+                            "source": "(cosineSimilarity(params.query_vector, doc['abstract_vector'])+ 1.0)*params.boost_vec",
+                            "params": {"query_vector": query_vector, "boost_vec": boost_vec_title}
                         }
                     }
                 },
                 {
                     "script_score": {
                         "script": {
-                            "source": "(cosineSimilarity(params.query_vector, doc['title_vector'])+ 1.0)*10",
-                            "params": {"query_vector": query_vector}
+                            "source": "(cosineSimilarity(params.query_vector, doc['title_vector'])+ 1.0)*params.boost_vec",
+                            "params": {"query_vector": query_vector, "boost_vec": boost_vec_abstract}
                         }
                     }
                 }
@@ -83,15 +83,20 @@ def vector_search(query, query_vector):
 @app.route('/search')
 def analyzer():
     query = request.args.get('q')
+    boost_title = int(request.args.get('boost_title'))
+    boost_abstract = int(request.args.get('boost_abstract'))
+    boost_vec_title = int(request.args.get('boost_vec_title'))
+    boost_vec_abstract = int(request.args.get('boost_vec_abstract'))
     mode = request.args.get('mode')
 
     query_vector = bc.encode([query])[0]
     pprint(query)
 
     if mode == "vec":
-        request_elastic = vector_search(query, query_vector)
+        request_elastic = vector_search(query, query_vector, boost_title,
+                                        boost_abstract, boost_vec_title, boost_vec_abstract)
     else:
-        request_elastic = word_search(query)
+        request_elastic = word_search(query, boost_title, boost_abstract)
 
     try:
         response = client.search(

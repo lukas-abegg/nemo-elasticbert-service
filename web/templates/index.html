@@ -43,6 +43,62 @@
                                v-model="mode">
                         Keyword Search
                     </label>
+                    &nbsp;
+                    <v-bottom-sheet v-model="sheet">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="blue" dark v-on="on">
+                                Change Boosts
+                            </v-btn>
+                        </template>
+                        <v-sheet class="text-center">
+                            <v-btn class="mt-6" dark color="blue" @click="sheet = !sheet">close</v-btn>
+                            <v-row justify="space-around">&nbsp;</v-row>
+                            <v-row justify="space-around">&nbsp;</v-row>
+
+                            <v-row justify="space-around">
+                                <v-col cols="10">
+                                    <v-subheader class="pl-0">Boost Title</v-subheader>
+                                    <v-slider
+                                            value="boost_title"
+                                            v-model="boost_title"
+                                            min="0"
+                                            max="10"
+                                            thumb-label="always"
+                                    ></v-slider>
+                                </v-col>
+                                <v-col cols="10">
+                                    <v-subheader class="pl-0">Boost Abstract</v-subheader>
+                                    <v-slider
+                                            value="boost_abstract"
+                                            v-model="boost_abstract"
+                                            min="0"
+                                            max="10"
+                                            thumb-label="always"
+                                    ></v-slider>
+                                </v-col>
+                                <v-col cols="10">
+                                    <v-subheader class="pl-0">Boost Title Vector</v-subheader>
+                                    <v-slider
+                                            value="boost_vec_title"
+                                            v-model="boost_vec_title"
+                                            min="0"
+                                            max="10"
+                                            thumb-label="always"
+                                    ></v-slider>
+                                </v-col>
+                                <v-col cols="10">
+                                    <v-subheader class="pl-0">Boost Abstract Vector</v-subheader>
+                                    <v-slider
+                                            value="boost_vec_abstract"
+                                            v-model="boost_vec_abstract"
+                                            min="0"
+                                            max="10"
+                                            thumb-label="always"
+                                    ></v-slider>
+                                </v-col>
+                            </v-row>
+                        </v-sheet>
+                    </v-bottom-sheet>
                 </div>
             </v-col>
             <div class="flex-grow-1"></div>
@@ -52,11 +108,14 @@
                 <v-col cols="12" md="6" offset-md="2" offset-lg="2" offset-xl="2">
                     <template v-if="'hits' in result">
                         <v-card-actions>
-                                <v-chip class="secondary">Found documents: [[ result.hits.total.value ]]</v-chip>
-                            </v-card-actions>
+                            <v-chip class="secondary">Found documents: [[ result.hits.total.value ]]</v-chip>
+                        </v-card-actions>
                         <v-card max-width="700" flat v-for="(item, index) in result.hits.hits" :key="index">
                             <v-card-title>[[ item._source.title ]]</v-card-title>
-                            <v-card-text><v-chip>[[ item._source.id ]] </v-chip> &nbsp;&nbsp; <v-chip class="primary">Relevance Score: [[ item._score ]]</v-chip></v-card-text>
+                            <v-card-text>
+                                <v-chip>[[ item._source.id ]]</v-chip> &nbsp;&nbsp;
+                                <v-chip class="primary">Relevance Score: [[ item._score ]]</v-chip>
+                            </v-card-text>
                             <v-card-text>[[ item._source.abstract.slice(0, 300) ]]...</v-card-text>
 
                         </v-card>
@@ -81,21 +140,26 @@
         data: {
             query: '',
             mode: '',
+            boost_title: 5,
+            boost_abstract: 3,
+            boost_vec_title: 10,
+            boost_vec_abstract: 8,
+            sheet: false,
             result: []
         },
         created() {
-            this.query = 'lungenkarzinom'
+            this.query = "lungenkarzinom"
             this.mode = "vec"
             this.search()
         },
         methods: {
             search() {
-                axios.get(`${base_url}search?q=${this.query}&mode=${this.mode}`).then(response => {
+                axios.get(`${base_url}search?q=${this.query}&mode=${this.mode}&boost_title=${this.boost_title}&boost_abstract=${this.boost_abstract}&boost_vec_title=${this.boost_vec_title}&boost_vec_abstract=${this.boost_vec_abstract}`).then(response => {
                     this.result = response.data;
                 })
             },
             submit() {
-                if (this.query == '') {
+                if (this.query === '') {
                     this.result = [];
                     return;
                 }
